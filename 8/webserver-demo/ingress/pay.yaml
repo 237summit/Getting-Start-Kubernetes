@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: pay-rc
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: pay
+    spec:
+      containers:
+      - image: smlinux/pay
+        name: pay
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pay-service
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: pay

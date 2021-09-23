@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deploy
+spec:
+  selector:
+    matchLabels:
+      app: webui
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: webui
+    spec:
+      containers:
+      - image: nginx:1.14
+        name: web
+        ports:
+        - containerPort: 80

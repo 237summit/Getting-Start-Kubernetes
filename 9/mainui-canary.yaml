@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mainui-canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mainui
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: mainui
+        version: canary
+    spec:
+      containers:
+      - name: mainui
+        image: nginx:1.15
+        ports:
+        - containerPort: 80

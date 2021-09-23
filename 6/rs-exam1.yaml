@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: rs-exam1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: webui
+    matchExpressions:
+    - {key: ver, operator: Exists}
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        app: webui
+        ver: "1.15"
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:1.14

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-annotation
+  annotations:
+    builder: "seongmi Lee (seongmi.lee@gmail.com)"
+    buildDate: "20210502"
+    imageRegistry: https://hub.docker.com/
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14
+    ports:
+    - containerPort: 80

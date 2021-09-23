@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql-pod
+spec:
+  initContainers:
+  - name: init-mysql
+    image: mysql:5.7
+    command: ['bash', '-c', "until hostname; do echo waiting for db service; sleep 2; done"]
+
+  containers:
+  - name: mysql
+    image: mysql:5.7
+    env:
+    - name: "MYSQL_ROOT_PASSWORD"
+      value: "pass"
+    ports:
+    - containerPort: 3306
+    livenessProbe:
+      exec:
+        command:
+        - mysqladmin
+        - ping
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"

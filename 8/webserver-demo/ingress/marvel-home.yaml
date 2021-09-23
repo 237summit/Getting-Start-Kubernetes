@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: marvel-home
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: marvel
+  template:
+    metadata:
+      labels:
+        name: marvel
+    spec:
+      containers:
+      - image: smlinux/marvel-collection
+        name: marvel-container
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: marvel-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    name: marvel
+

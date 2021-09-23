@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: stress-pod
+spec:
+  containers:
+  - image: smlinux/vish-stress
+    name: stress-container
+    resources:
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+      requests:
+        cpu: "0.5"
+        memory: "250Mi"
+    args:
+    - -cpus
+    - "1"
+    - -mem-total
+    - "600Mi"
+    - -mem-alloc-size
+    - "100Mi"
+    - -mem-alloc-sleep
+    - "1s"
+

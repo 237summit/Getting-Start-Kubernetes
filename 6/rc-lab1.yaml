@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rc-main
+spec:
+  replicas: 2
+  selector:
+    app: main
+    name: apache
+    rel: stable
+  template:
+    metadata:
+      labels:
+        app: main
+        name: apache
+        rel: stable
+    spec:
+      containers:
+      - name: webui
+        image: httpd:2.2
+        ports:
+        - containerPort: 80
