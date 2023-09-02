@@ -1,0 +1,63 @@
+# Install Helm
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+
+helm version
+
+source <(helm completion bash)
+echo "source <(helm completion bash)" >> ~/.bashrc
+
+
+# Helm 사용하기
+helm --help
+
+
+# Repository 추가/삭제 : helm repo [add|remove|list] [NAME] [URL]
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo list
+
+#Repository에서 제공하는 chart 검색 : helm search repo [keyword]
+helm search repo
+helm search repo  nginx
+
+# chart 정보 보기 :
+#  helm show chart [CHART]
+#  helm inspect values [CHART]
+# Chart.yaml 파일의 내용과 chart의 세부정보 출력
+helm show chart bitnami/nginx
+helm inspect values bitnami/nginx
+
+#chart 아카이브 설치:  helm install chart_name  [CHART]
+#chart를 설치하고 설치된 패키지 운영 요약 메시지 출력
+helm install webserver bitnami/nginx
+helm install webserver --set service.type=NodePort  bitnami/nginx
+helm list
+kubectl get all
+
+#chart 아카이브 삭제:  helm uninstall chart_name 
+#chart를 설치하고 설치된 패키지 운영 요약 메시지 출력
+helm uninstall webserver
+
+# Repository 삭제
+helm repo list
+
+# valume.yaml 파일을 적용하여 패키지 실행
+helm inspect values bitnami/nginx > nginx_value.yaml
+vi nginx_value.yaml
+service:
+  ## @param service.type Service type
+  ##
+  type: NodePort
+...
+
+helm install webserver -f nginx_values.yaml  bitnami/nginx
+kubectl get all
+helm uninstall webserver
+
+
+# helm 패키지 구조 보기
+helm pull bitnami/nginx
+tar zxvf nginx-15.2.0.tgz
+tree nginx
+
