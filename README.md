@@ -1,6 +1,6 @@
 # 쿠버네티스 실습 LAB
 ## 따배쿠 사용 example
-## Last updated on: September 23, 2021
+## Last updated on: 2023.09.02
 ## CONTENTS
 ├── 5  
 │   ├── init-container-exam2.yaml  
