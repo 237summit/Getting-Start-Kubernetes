@@ -1,0 +1,9 @@
+apiVersion: v2
+name: mynginx
+description: A halm chart for running nginx web server
+
+type: application
+
+version: 0.1.0
+
+appVersion: "1.16.0"

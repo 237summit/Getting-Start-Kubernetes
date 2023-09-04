@@ -61,3 +61,102 @@ helm pull bitnami/nginx
 tar zxvf nginx-15.2.0.tgz
 tree nginx
 
+# Create helm chart
+mkdir manifests
+kubectl create deployment webserver --image nginx:1.25.2 --port 80 -o yaml > manifests/deployment.yaml
+kubectl expose deployment webserver --port 80 --target-port 80 --type NodePort -o yaml >  manifests/service.yaml
+tree manifests/
+kubectl delete -f manifests/
+
+helm create mynginx
+tree mynginx/
+rm mynginx/templates/*.yaml mynginx/templates/{_helpers.tpl,NOTES.txt}
+rm -rf mynginx/templates/tests/
+cp manifests/* mynginx/templates/
+vi mynginx/Chart.yaml
+..
+description: A halm chart for running nginx web server
+
+tree mynginx/
+
+# chart를 TEST 실행하여 오류 유무를 확인
+# helm lint PATH [flags]
+helm lint mynginx/
+
+# 실행
+helm install webserver ./mynginx/
+
+
+#서비스 동작 중인지확인
+helm list
+Kubectl get all
+curl localhost:XXXX
+helm uninstall webserver
+
+
+##################
+# mynginx chart에 변수(values.yaml) 설정
+
+cat > mynginx/values.yaml 
+replicaCount: 1
+image:
+  repository: nginx
+  tag: 1.25.2
+  pullPolicy: IfNotPresent
+  pullSecret:
+service:
+  type: NodePort
+
+# Chart.yaml, values.yaml 파일 기준으로 변수 설정
+vi mynginx/templates/deployment.yaml
+vi mynginx/templates/service.yaml
+
+# chart 실행
+helm install webserver ./mynginx/
+helm list
+kubectl get all
+curl localhost:X
+
+#helm 으로 실행한 차트 수정해서 재실행
+helm upgrade --set image.repository=httpd --set image.tag=2.2.34-alpine webserver mynginx
+curl localhost:X
+helm list
+
+#helm을 이용한 roleback
+helm rollback webserver 1
+curl localhost:X
+
+helm list
+helm uninstall webserver
+ 
+# helm chart 파일 만들기
+helm package mynginx
+ls mynginx-0.1.0.tgz
+kubectl get all
+curl localhost:XXXX
+
+
+# 4. Github repository를 이용해 helm chart 배포하기
+# repository 만들기
+# source code push
+git clone https://github.com/237summit/helm.git
+cd helm/
+git config --global user.email "seongmi.lee@gmail.com"
+git config --global user.name "237summit"
+
+cat <<EOF > README.md
+# Helm Chart
+Helm chart repository provided by ttabae
+EOF
+
+mkdir stable
+cp ~/mynginx-0.1.0.tgz stable/
+vi index.yaml
+tree 
+
+
+git branch -M main
+git add .
+git commit -m "Create myginx helm chart"
+git push -u origin main
+
