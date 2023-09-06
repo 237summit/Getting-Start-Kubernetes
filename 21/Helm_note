@@ -24,7 +24,7 @@ helm search repo  nginx
 # chart 정보 보기 :
 #  helm show chart [CHART]
 #  helm inspect values [CHART]
-# Chart.yaml 파일의 내용과 chart의 세부정보 출력
+# Chart.yaml 파일의 내용과ls chart의 세부정보 출력
 helm show chart bitnami/nginx
 helm inspect values bitnami/nginx
 
@@ -61,7 +61,9 @@ helm pull bitnami/nginx
 tar zxvf nginx-15.2.0.tgz
 tree nginx
 
-# Create helm chart
+
+# Helm Chart 만들기
+# Create helm chart : mynginx
 mkdir manifests
 kubectl create deployment webserver --image nginx:1.25.2 --port 80 -o yaml > manifests/deployment.yaml
 kubectl expose deployment webserver --port 80 --target-port 80 --type NodePort -o yaml >  manifests/service.yaml
@@ -115,7 +117,7 @@ vi mynginx/templates/service.yaml
 helm install webserver ./mynginx/
 helm list
 kubectl get all
-curl localhost:X
+curl localhost:30671
 
 #helm 으로 실행한 차트 수정해서 재실행
 helm upgrade --set image.repository=httpd --set image.tag=2.2.34-alpine webserver mynginx
@@ -137,26 +139,41 @@ curl localhost:XXXX
 
 
 # 4. Github repository를 이용해 helm chart 배포하기
-# repository 만들기
-# source code push
-git clone https://github.com/237summit/helm.git
-cd helm/
-git config --global user.email "seongmi.lee@gmail.com"
-git config --global user.name "237summit"
+# 4.1 repository 만들기
+# 4.2 chart package 만들기
+mkdir my-helm-repo; cd my-helm-repo/
+git init
+git config --global user.email "MAIL_address"
+git config --global user.name "GIT ID"
 
 cat <<EOF > README.md
-# Helm Chart
+# My Helm Chart
+
 Helm chart repository provided by ttabae
+
+      helm repo add my-helm-repo https://237summit.github.io/my-helm-chart/
+      helm repo list
+      helm repo update
+      helm search repo mynginx
+      helm install webserver my-helm-repo/mynginx
 EOF
+cp ~/mynginx-0.1.0.tgz .
+helm repo index .
 
-mkdir stable
-cp ~/mynginx-0.1.0.tgz stable/
-vi index.yaml
-tree 
-
-
-git branch -M main
 git add .
-git commit -m "Create myginx helm chart"
-git push -u origin main
+git commit -m "Create mynginx helm chart"
 
+git remote add origin https://github.com/237summit/my-helm-repo.git
+git push -u origin master
+
+#4.3 Github page 만들기
+#4.4 Helm repository  구성
+helm repo add my-helm-repo https://237summit.github.io/my-helm-repo/
+helm repo list
+helm repo update
+
+helm search repo mynginx
+helm install webserver my-helm-repo/mynginx
+kubectl get all
+curl localhost:30032
+helm uninstall webserver
