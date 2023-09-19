@@ -1,0 +1,65 @@
+Kubernetes Dashboard
+
+1. NodePort로 대시보드 실행
+참고: https://kubernetes.io/ko/docs/tasks/access-application-cluster/web-ui-dashboard/
+      대시보드 버전은 docs 에 맞춰서 진행하시면 됩니다. 
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.6.1/aio/deploy/recommended.yaml
+kubectl get all -n kubernetes-dashboard
+# ServiceType을 NodePort로 수정
+kubectl -n kubernetes-dashboard edit service kubernetes-dashboard
+  type: NodePort
+
+kubectl -n kubernetes-dashboard get service kubernetes-dashboard
+
+
+# 대시보드 접속 활성화
+kubectl proxy --address=10.0.2.20 --accept-hosts='^*$'
+curl 10.0.2.20:8001
+
+
+2. 대시보드  UI 연결
+2.1 대시보드 접속 가능한 ServiceAccount 생성
+ServiceAccount 생성 : admin-user
+ClusterRoleBinding : admin-user – cluster-admin
+ServiceAccount를 위한 Bearer Token 가져오기
+Bearer Token을 Secret으로 저장
+토큰 확인 후 인증
+https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/creating-sample-user.md
+
+cat << EOF | kubectl apply -f -
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kubernetes-dashboard
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kubernetes-dashboard
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: admin-user
+  namespace: kubernetes-dashboard
+  annotations:
+    kubernetes.io/service-account.name: "admin-user"   
+type: kubernetes.io/service-account-token 
+
+EOF
+
+
+2.2 로그인 토큰 확인
+kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath={".data.token"} | base64 -d
+
+2.3 대시보드 연결
+https://10.0.2.20:NODEPORT/
