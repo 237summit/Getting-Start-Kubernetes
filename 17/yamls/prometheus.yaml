@@ -112,7 +112,19 @@ data:
           - "alertmanager.monitoring.svc:9093"
 
     scrape_configs:
+      - job_name: 'node-exporter'
+
+        kubernetes_sd_configs:
+          - role: endpoints
+        
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_endpoints_name]
+          regex: 'node-exporter'
+          action: keep
+
       - job_name: 'kubernetes-apiservers'
+        static_configs:
+        - targets: ['node-exporter.monitoring.svc.cluster.local:9100']
 
         kubernetes_sd_configs:
         - role: endpoints
@@ -280,7 +292,7 @@ metadata:
 spec:
   selector:
     app: prometheus-server
-  type: LoadBalancer
+  type: NodePort
   ports:
     - port: 8080
       targetPort: 9090
